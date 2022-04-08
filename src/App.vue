@@ -58,16 +58,28 @@
     methods: {
       checkInputs() {
         // this.$refs.questionSurvey.checkQuestionInputs();
+        console.log("True or false: ", this.valueEmpty);
+        // if (this.valueEmpty != false) {
         this.page = this.page + 1;
+        console.log("Data Array: ", this.answerArr);
+        // }
       },
       optionUpdate: function (value) {
-        var obj = { qh: value[1], qt: value[2], qti: [{ i: value[3] }] };
-        this.answerArr[value[1]] = obj;
+        if (value[2] == "") {
+          this.value = false;
+        } else {
+          this.value = true;
+        }
+        var obj = { qh: value[0], qt: value[1], qti: [{ i: value[2] }] };
+        this.answerArr[value[0]] = obj;
+        // console.log("Data Array: " + this.answerArr);
       },
       collectAllData() {
-        console.log("Data Array 1", this.answerArr);
-        const jsonObj = JSON.stringify(this.answerArr);
-        console.log("Data Array ", jsonObj);
+        if (this.valueEmpty != false) {
+          console.log("Data Array 1", this.answerArr);
+          const jsonObj = JSON.stringify(this.answerArr);
+          console.log("Data Array ", jsonObj);
+        }
       },
       firstConfig() {
         var self = this;

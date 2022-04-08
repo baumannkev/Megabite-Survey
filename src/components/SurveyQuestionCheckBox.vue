@@ -25,13 +25,16 @@
         // console.log("qhash " + this.questionHash);
         // console.log("ihash " + this.select_data);
         this.isEmpty = false;
-        this.$emit("update:optionCheckbox", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+        this.$emit("update:optionCheckbox", [this.questionHash, this.questionType, [this.select_data]]);
       },
     },
     created() {
       //console.log("beko",this.question)
       this.isEmpty = true;
-      this.$emit("update:optionCheckbox", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+      console.log("Run");
+      // this.optionChangedCheckbox();
+      this.$emit("update:optionCheckbox", [this.questionHash, this.questionType, [this.select_data]]);
+      // this.$emit("update:optionCheckbox", [this.questionHash, this.questionType, [this.select_data]]);
     },
   };
 </script>

@@ -28,6 +28,7 @@
     },
     created() {
       //console.log("beko",this.question)
+      this.$emit("update:optionText", [this.questionHash, this.questionType, [this.select_data]]);
     },
   };
 </script>

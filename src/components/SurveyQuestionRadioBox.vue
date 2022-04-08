@@ -23,7 +23,7 @@
       optionChangedRadio: function () {
         // console.log("type " + this.questionType);
         this.isEmpty = false;
-        this.$emit("update:optionRadio", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+        this.$emit("update:optionRadio", [this.questionHash, this.questionType, [this.select_data]]);
       },
       function() {},
     },
@@ -36,7 +36,8 @@
       // } else {
       //   console.log("Invalid");
       // }
-      this.$emit("update:optionRadio", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+      this.$emit("update:optionRadio", [this.questionHash, this.questionType, [this.select_data]]);
+      // this.$emit("update:optionRadio", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
     },
   };
 </script>
