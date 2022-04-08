@@ -1,109 +1,181 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">SurveyJS + VueJS</a>
-        </div>
-        <ul class="nav navbar-nav">
-          <li>
-            <router-link to="/">Home</router-link>
-          </li>
-          <li>
-            <router-link to="/survey">Survey</router-link>
-          </li>
-          <li>
-            <router-link to="/creator">SurveyJS Creator</router-link>
-          </li>
-          <li>
-            <router-link to="/exportpdf">PDF Export</router-link>
-          </li>
-          <li>
-            <router-link to="/analytics">Analytics</router-link>
-          </li>
-          <li>
-            <router-link to="/analyticstabulator">Results Table</router-link>
-          </li>
-          <li>
-            <router-link to="/analyticsdatatables"
-              >Results Table (IE Support)</router-link
-            >
-          </li>
-          <!-- <li>
-            <router-link to="/bar/baz">/bar/baz</router-link>
-          </li>
-          <li>
-            <router-link to="/a/b/c">/a/b/c</router-link>
-          </li>-->
-        </ul>
+    <div class="loading" v-if="loadingStat">
+      <div class="lds-ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
-    </nav>
-    <router-view class="view"></router-view>
+    </div>
+    <div id="main-area" v-bind:class="{ ok: loadingComplete }">
+      <div>
+        <div><img src="https://www.megabitepizza.com/images/logo.png" /></div>
+        <h2>{{ start_title }}</h2>
+
+        <div v-if="page == 0" v-cloak>
+          <div class="start" v-cloak v-html="start_content"></div>
+          <button class="sbtn" @click="page = 1">START SURVEY</button>
+        </div>
+
+        <div v-for="(pageitem, index) in pages" :key="index" v-show="index == page - 1" class="page" v-cloak>
+          <div class="p-content" v-html="pageitem.content" v-cloak></div>
+
+          <survey-question @update:option="optionUpdate" :question="pageitem.questions" ref="questionSurvey"></survey-question>
+          <button class="sbtn" @click="page = page - 1" v-if="page != 1">PREVIOUS PAGE</button>
+          <button class="sbtn" type="submit" @click.prevent="checkInputs" v-if="page < pages.length">NEXT PAGE</button>
+          <button class="sbtn" @click="collectAllData" v-if="page == pages.length">FINISH</button>
+        </div>
+      </div>
+    </div>
+    <div>{{ errorMessage }}</div>
   </div>
 </template>
 
 <script>
-import Vue from "vue";
-import VueRouter from "vue-router";
+  //import HelloWorld from './components/HelloWorld.vue'
+  import SurveyQuestion from "./components/SurveyQuestion.vue";
 
-import "bootstrap/dist/css/bootstrap.css";
-
-Vue.use(VueRouter);
-
-const Home = () => import("./views/Home.vue");
-const Survey = () =>
-  import(/* webpackChunkName: "survey" */ "./views/Survey.vue");
-const Creator = () =>
-  import(/* webpackChunkName: "creator" */ "./views/Creator.vue");
-const ExportToPDF = () =>
-  import(/* webpackChunkName: "creator" */ "./views/ExportToPDF.vue");
-const Analytics = () =>
-  import(/* webpackChunkName: "creator" */ "./views/Analytics.vue");
-const AnalyticsTabulator = () =>
-  import(/* webpackChunkName: "creator" */ "./views/AnalyticsTabulator.vue");
-const AnalyticsDatatables = () =>
-  import(/* webpackChunkName: "creator" */ "./views/AnalyticsDatatables.vue");
-
-const router = new VueRouter({
-  mode: "history",
-  base: __dirname,
-  routes: [
-    { path: "/", component: Home },
-    // Just use them normally in the route config
-    { path: "/survey", component: Survey },
-    // multiple parameters, `/` should not be encoded. The name is also important
-    // https://github.com/vuejs/vue-router/issues/2719
-    // { path: '/a/:tags*', name: 'tagged', component: () => new Promise(resolve => {
-    //   setTimeout(() => {
-    //     resolve({
-    //       template: `<div>
-    //         <h2>Lazy with params</h2>
-    //         <pre id="tagged-path">{{ $route.path }}</pre>
-    //       </div>`
-    //     })
-    //   }, 200)
-    // }) },
-    // Bar and Baz belong to the same root route
-    // and grouped in the same async chunk.
-    { path: "/creator", component: Creator },
-    { path: "/exportpdf", component: ExportToPDF },
-    { path: "/analytics", component: Analytics },
-    { path: "/analyticstabulator", component: AnalyticsTabulator },
-    { path: "/analyticsdatatables", component: AnalyticsDatatables },
-  ],
-});
-
-export default {
-  name: "app",
-  router: router,
-};
+  export default {
+    name: "App",
+    data() {
+      return {
+        loadingComplete: false,
+        loadingStat: true,
+        start_content: "",
+        start_title: "",
+        page: 0,
+        pages: [],
+        question1: "",
+        answerArr: {},
+        valueEmpty: false,
+        errorMessage: "",
+      };
+    },
+    components: {
+      SurveyQuestion,
+    },
+    methods: {
+      checkInputs() {
+        // this.$refs.questionSurvey.checkQuestionInputs();
+        this.page = this.page + 1;
+      },
+      optionUpdate: function (value) {
+        var obj = { qh: value[1], qt: value[2], qti: [{ i: value[3] }] };
+        this.answerArr[value[1]] = obj;
+      },
+      collectAllData() {
+        console.log("Data Array 1", this.answerArr);
+        const jsonObj = JSON.stringify(this.answerArr);
+        console.log("Data Array ", jsonObj);
+      },
+      firstConfig() {
+        var self = this;
+        const baseURI = "https://survey.androvega.ca/form?sh=s1234";
+        this.$http.get(baseURI).then((result) => {
+          self.start_title = result.data.title;
+          self.start_content = result.data.content;
+          self.pages = result.data.pages;
+          self.loadingStat = false;
+          self.page = 0;
+          self.loadingComplete = true;
+        });
+      },
+    },
+    created() {
+      this.firstConfig();
+    },
+  };
 </script>
 
 <style>
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
+  [v-cloak] {
+    display: none;
+  }
+
+  #app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 60px;
+  }
+  #main-area {
+    display: none;
+  }
+
+  #main-area.ok {
+    display: block;
+  }
+  .loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-top: calc(50vh - 40px);
+  }
+  .lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 8px solid #fff;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #fff transparent transparent transparent;
+  }
+  .lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+  .lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+  .lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+  @keyframes lds-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  h2 {
+    color: #ffffff;
+    line-height: 2em;
+  }
+  .start {
+    background: #ffffff;
+    border-radius: 10px;
+    margin: 20px;
+    padding: 20px;
+  }
+  .page {
+    background: #ffffff;
+    border-radius: 10px;
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .sbtn {
+    padding: 10px 30px;
+    border: none;
+    background: #ed1d24;
+    color: #ffffff;
+    border-radius: 2px;
+  }
 </style>
