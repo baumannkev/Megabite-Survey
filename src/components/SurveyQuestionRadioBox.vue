@@ -17,13 +17,14 @@
         questionHash: this.item.qhash,
         questionType: this.item.qtype,
         isEmpty: false,
+        questionRequired: this.item.required,
       };
     },
     methods: {
       optionChangedRadio: function () {
-        // console.log("type " + this.questionType);
-        this.isEmpty = false;
-        this.$emit("update:optionRadio", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+        // console.log("required " + this.questionRequired);
+
+        this.$emit("update:optionRadio", [this.questionHash, this.questionType, [this.select_data], this.questionRequired]);
       },
       function() {},
     },
@@ -36,7 +37,8 @@
       // } else {
       //   console.log("Invalid");
       // }
-      this.$emit("update:optionRadio", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+      this.$emit("update:optionRadio", [this.questionHash, this.questionType, [this.select_data], this.questionRequired]);
+      // this.$emit("update:optionRadio", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
     },
   };
 </script>

@@ -17,6 +17,7 @@
         questionHash: this.item.qhash,
         questionType: this.item.qtype,
         isEmpty: false,
+        questionRequired: this.item.required,
       };
     },
     methods: {
@@ -25,13 +26,15 @@
         // console.log("qhash " + this.questionHash);
         // console.log("ihash " + this.select_data);
         this.isEmpty = false;
-        this.$emit("update:optionCheckbox", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+        this.$emit("update:optionCheckbox", [this.questionHash, this.questionType, [this.select_data], this.questionRequired]);
       },
     },
     created() {
       //console.log("beko",this.question)
       this.isEmpty = true;
-      this.$emit("update:optionCheckbox", [this.isEmpty, this.questionHash, this.questionType, [this.select_data]]);
+      // this.optionChangedCheckbox();
+      this.$emit("update:optionCheckbox", [this.questionHash, this.questionType, [this.select_data], this.questionRequired]);
+      // this.$emit("update:optionCheckbox", [this.questionHash, this.questionType, [this.select_data]]);
     },
   };
 </script>

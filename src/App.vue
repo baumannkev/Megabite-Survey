@@ -24,18 +24,17 @@
           <survey-question @update:option="optionUpdate" :question="pageitem.questions" ref="questionSurvey"></survey-question>
           <button class="sbtn" @click="page = page - 1" v-if="page != 1">PREVIOUS PAGE</button>
           <button class="sbtn" type="submit" @click.prevent="checkInputs" v-if="page < pages.length">NEXT PAGE</button>
-          <button class="sbtn" @click="collectAllData" v-if="page == pages.length">FINISH</button>
+          <button class="sbtn" @click="checkInputs" v-if="page == pages.length">FINISH</button>
         </div>
       </div>
     </div>
-    <div>{{ errorMessage }}</div>
+    <div class="errorMessage">{{ errorMessage }}</div>
   </div>
 </template>
 
 <script>
   //import HelloWorld from './components/HelloWorld.vue'
   import SurveyQuestion from "./components/SurveyQuestion.vue";
-
   export default {
     name: "App",
     data() {
@@ -50,6 +49,8 @@
         answerArr: {},
         valueEmpty: false,
         errorMessage: "",
+
+        questionArray: [],
       };
     },
     components: {
@@ -57,17 +58,55 @@
     },
     methods: {
       checkInputs() {
-        // this.$refs.questionSurvey.checkQuestionInputs();
-        this.page = this.page + 1;
+        if (this.page == 1) {
+          let abc6 = this.answerArr.abc6.qti[0].i[0];
+          let abc7 = this.answerArr.abc7.qti[0].i[0];
+          let abc5 = this.answerArr.abc5.qti[0].i[0];
+
+          if (abc6 != "" && abc7 != "" && abc5 != "") {
+            this.errorMessage = "";
+            this.page = this.page + 1;
+          } else {
+            this.errorMessage = "* Forgot a question?";
+          }
+        } else if (this.page == 2) {
+          let abc3 = this.answerArr.abc3.qti[0].i[0];
+          let abc2 = this.answerArr.abc2.qti[0].i[0];
+          let abc1 = this.answerArr.abc1.qti[0].i[0];
+
+          if (abc3 != "" && abc2 != "" && abc1 != "") {
+            this.errorMessage = "";
+            this.collectAllData();
+          } else {
+            this.errorMessage = "* Forgot a question?";
+          }
+        }
       },
       optionUpdate: function (value) {
-        var obj = { qh: value[1], qt: value[2], qti: [{ i: value[3] }] };
-        this.answerArr[value[1]] = obj;
+        // console.log("Value[2] ", value[2]);
+        if (value[2] == "" && value[3] == 1) {
+          this.valueEmpty = false;
+        } else {
+          this.valueEmpty = true;
+        }
+        var obj = { qh: value[0], qt: value[1], qti: [{ i: value[2] }] };
+        this.answerArr[value[0]] = obj;
+        // console.log("Data Array: " + this.answerArr);
       },
       collectAllData() {
-        console.log("Data Array 1", this.answerArr);
+        // const jsonObj1 = JSON.stringify(this.answerArr);
+        // console.log("Test: ", jsonObj1[0]);
+
+        // console.log("Value : " + this.valueEmpty);
+
+        // if (abc1 != "") {
+        console.log("Data array before = ", this.answerArr[0]);
+        console.log("Data Array 1", this.answerArr.abc1.qti[0].i[0]);
         const jsonObj = JSON.stringify(this.answerArr);
         console.log("Data Array ", jsonObj);
+        // } else {
+        // console.log("Forgot to input: ");
+        // }
       },
       firstConfig() {
         var self = this;
@@ -92,7 +131,6 @@
   [v-cloak] {
     display: none;
   }
-
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -104,7 +142,6 @@
   #main-area {
     display: none;
   }
-
   #main-area.ok {
     display: block;
   }
@@ -116,7 +153,6 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
   }
-
   .lds-ring {
     display: inline-block;
     position: relative;
@@ -153,7 +189,6 @@
       transform: rotate(360deg);
     }
   }
-
   h2 {
     color: #ffffff;
     line-height: 2em;
@@ -170,12 +205,15 @@
     margin: 20px;
     padding: 20px;
   }
-
   .sbtn {
     padding: 10px 30px;
     border: none;
     background: #ed1d24;
     color: #ffffff;
     border-radius: 2px;
+  }
+
+  .errorMessage {
+    color: #ffffff;
   }
 </style>

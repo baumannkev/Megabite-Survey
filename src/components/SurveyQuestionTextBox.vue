@@ -16,6 +16,7 @@
         select_data: "",
         questionHash: this.item.qhash,
         questionType: this.item.qtype,
+        questionRequired: this.item.required,
       };
     },
     methods: {
@@ -23,11 +24,12 @@
         // if (this.itemContent == "Not from Canada? Enter the country in which you reside." && this.select_data == "") {
         //   this.$emit("update:optionText", [this.itemContent, this.select_data]);
         // }
-        this.$emit("update:optionText", [this.questionHash, this.questionType, [this.select_data]]);
+        this.$emit("update:optionText", [this.questionHash, this.questionType, [this.select_data], this.questionRequired]);
       },
     },
     created() {
       //console.log("beko",this.question)
+      this.$emit("update:optionText", [this.questionHash, this.questionType, [this.select_data], this.questionRequired]);
     },
   };
 </script>
