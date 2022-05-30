@@ -83,7 +83,6 @@
         }
       },
       optionUpdate: function (value) {
-        // console.log("Value[2] ", value[2]);
         if (value[2] == "" && value[3] == 1) {
           this.valueEmpty = false;
         } else {
@@ -91,22 +90,10 @@
         }
         var obj = { qh: value[0], qt: value[1], qti: [{ i: value[2] }] };
         this.answerArr[value[0]] = obj;
-        // console.log("Data Array: " + this.answerArr);
       },
       collectAllData() {
-        // const jsonObj1 = JSON.stringify(this.answerArr);
-        // console.log("Test: ", jsonObj1[0]);
-
-        // console.log("Value : " + this.valueEmpty);
-
-        // if (abc1 != "") {
-        console.log("Data array before = ", this.answerArr[0]);
-        console.log("Data Array 1", this.answerArr.abc1.qti[0].i[0]);
         const jsonObj = JSON.stringify(this.answerArr);
         console.log("Data Array ", jsonObj);
-        // } else {
-        // console.log("Forgot to input: ");
-        // }
       },
       firstConfig() {
         var self = this;
